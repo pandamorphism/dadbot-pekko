@@ -1,0 +1,27 @@
+// Run with "task: spawn" (alt-shift-t). Needs sbt on PATH (Coursier: `cs setup`).
+[
+  {
+    "label": "sbt test",
+    "command": "sbt test",
+    "use_new_terminal": false,
+    "reveal": "always"
+  },
+  {
+    "label": "Part 1: run (naive handler vs sharded Dad)",
+    "command": "sbt part1-actors/run",
+    "use_new_terminal": false,
+    "reveal": "always"
+  },
+  {
+    "label": "Part 1: test",
+    "command": "sbt part1-actors/test",
+    "use_new_terminal": false,
+    "reveal": "always"
+  },
+  {
+    "label": "scalafmt",
+    "command": "sbt scalafmtAll scalafmtSbt",
+    "use_new_terminal": false,
+    "reveal": "always"
+  }
+]
