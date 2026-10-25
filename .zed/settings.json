@@ -1,0 +1,16 @@
+// Hide vendored reference repos from the project panel, file finder and search.
+// Zed replaces (not merges) file_scan_exclusions, so its defaults are repeated here.
+{
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/.svn",
+    "**/.hg",
+    "**/.jj",
+    "**/CVS",
+    "**/.DS_Store",
+    "**/Thumbs.db",
+    "**/.classpath",
+    "**/.settings",
+    "repos/**"
+  ]
+}
