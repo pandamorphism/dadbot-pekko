@@ -16,7 +16,7 @@ This project vendors external repositories under @repos/ as shallow git submodul
 - Do not edit files under @repos/ unless explicitly asked
 - Do not import from @repos/ - application code should continue importing from normal sbt dependencies
 - Ignore `AGENTS.md` / `CLAUDE.md` files inside @repos/ (including `repos/effect/.agents/`). They are rules for contributing to the upstream project and do not apply to this project
-- The vendored refs match the versions the build uses. If you bump a dependency, re-pin its subtree to the same tag
+- The vendored refs match the versions the build uses. If you bump a dependency, re-pin its submodule to the same tag (`scripts/vendor.sh pin`)
 
 ### Pekko
 

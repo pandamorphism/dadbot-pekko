@@ -1,0 +1,8 @@
+[submodule "repos/pekko"]
+	path = repos/pekko
+	url = https://github.com/apache/pekko.git
+	shallow = true
+[submodule "repos/effect"]
+	path = repos/effect
+	url = https://github.com/Effect-TS/effect.git
+	shallow = true

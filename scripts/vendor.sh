@@ -14,8 +14,9 @@ cmd=${1:?usage: vendor.sh init | add <name> <url> <tag> | pin <name> <tag>}
 
 cd "$(git rev-parse --show-toplevel)"
 
-# Keep vendored files byte-identical to upstream regardless of global core.autocrlf.
-no_crlf() { git -C "repos/$1" config core.autocrlf false; }
+# Keep vendored files byte-identical to upstream regardless of global core.autocrlf:
+# -c covers the initial checkout (plus long paths on Windows), no_crlf persists it.
+no_crlf() { git -C "repos/$1" config core.autocrlf false; git -C "repos/$1" config core.longpaths true; }
 
 checkout_tag() { # <name> <tag>
   git -C "repos/$1" fetch --depth=1 --no-tags origin "refs/tags/$2:refs/tags/$2"
@@ -25,12 +26,12 @@ checkout_tag() { # <name> <tag>
 
 case "$cmd" in
   init)
-    git submodule update --init --depth=1
-    git submodule foreach --quiet 'git config core.autocrlf false'
+    git -c core.autocrlf=false -c core.longpaths=true submodule update --init --depth=1
+    git submodule foreach --quiet 'git config core.autocrlf false; git config core.longpaths true'
     ;;
   add)
     name=${2:?name required}; url=${3:?url required}; tag=${4:?tag required}
-    git submodule add --depth=1 "$url" "repos/$name"
+    git -c core.autocrlf=false -c core.longpaths=true submodule add --depth=1 "$url" "repos/$name"
     git config -f .gitmodules "submodule.repos/$name.shallow" true
     no_crlf "$name"
     checkout_tag "$name" "$tag"
