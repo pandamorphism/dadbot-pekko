@@ -8,7 +8,14 @@ val ScalaTestVersion = "3.2.19"
 
 lazy val root = (project in file("."))
   .aggregate(common, part1Actors)
-  .settings(name := "dadbot", publish / skip := true)
+  // `run` isn't aggregated, so root needs the parts on its classpath for Zed's ▶ (`sbt run` / `runMain`).
+  .dependsOn(part1Actors)
+  .settings(
+    name := "dadbot",
+    publish / skip := true,
+    run / fork := true,
+    Compile / discoveredMainClasses ++= (part1Actors / Compile / discoveredMainClasses).value
+  )
 
 // Services shared by every part: pun generator, chat, the scripted conversation.
 lazy val common = project

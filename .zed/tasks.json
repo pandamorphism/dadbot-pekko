@@ -7,6 +7,14 @@
     "reveal": "always"
   },
   {
+    // Bound to the ▶ next to a `@main` (tag from the Scala extension), runs exactly that main.
+    "label": "sbt runMain $ZED_CUSTOM_scala_package_name.$ZED_CUSTOM_scala_main_function_name",
+    "command": "sbt --client \"runMain $ZED_CUSTOM_scala_package_name.$ZED_CUSTOM_scala_main_function_name\"",
+    "use_new_terminal": false,
+    "reveal": "always",
+    "tags": ["scala-main"]
+  },
+  {
     "label": "Part 1: run (naive handler vs sharded Dad)",
     "command": "sbt part1-actors/run",
     "use_new_terminal": false,
