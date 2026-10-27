@@ -27,6 +27,37 @@
     "reveal": "always"
   },
   {
+    "label": "Part 2: run (three nodes in one JVM)",
+    "command": "sbt part2-messaging/run",
+    "use_new_terminal": false,
+    "reveal": "always"
+  },
+  {
+    "label": "Part 2: test",
+    "command": "sbt part2-messaging/test",
+    "use_new_terminal": false,
+    "reveal": "always"
+  },
+  {
+    // One terminal per node, so all three run side by side. Start node 0 first.
+    "label": "Part 2: node 0",
+    "command": "bash scripts/node.sh 0",
+    "use_new_terminal": true,
+    "reveal": "always"
+  },
+  {
+    "label": "Part 2: node 1",
+    "command": "bash scripts/node.sh 1",
+    "use_new_terminal": true,
+    "reveal": "always"
+  },
+  {
+    "label": "Part 2: node 2",
+    "command": "bash scripts/node.sh 2",
+    "use_new_terminal": true,
+    "reveal": "always"
+  },
+  {
     "label": "scalafmt",
     "command": "sbt scalafmtAll scalafmtSbt",
     "use_new_terminal": false,
