@@ -6,3 +6,11 @@
 	path = repos/effect
 	url = https://github.com/Effect-TS/effect.git
 	shallow = true
+[submodule "repos/pekko-management"]
+	path = repos/pekko-management
+	url = https://github.com/apache/pekko-management.git
+	shallow = true
+[submodule "repos/pekko-http"]
+	path = repos/pekko-http
+	url = https://github.com/apache/pekko-http.git
+	shallow = true
