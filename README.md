@@ -10,7 +10,7 @@ This repository builds the same app on [Apache Pekko](https://pekko.apache.org/)
 |------|-------------|--------------|--------|
 | 1. Actors | [Cluster, Part 1](https://effect.website/blog/module-of-the-week/cluster-actors) | `part1-actors` | code done, post published |
 | 2. Messaging | [Cluster, Part 2](https://effect.website/blog/module-of-the-week/cluster-messaging) | `part2-messaging` | code done, post published |
-| 3. Delivery | [Cluster, Part 3](https://effect.website/blog/module-of-the-week/cluster-delivery) | `part3-delivery` | code done, post planned |
+| 3. Delivery | [Cluster, Part 3](https://effect.website/blog/module-of-the-week/cluster-delivery) | `part3-delivery` | code done, [post published](https://kenchiku.dev/blog/pekko-cluster-3-delivery/) |
 | 4. Idempotency | [Cluster, Part 4](https://effect.website/blog/module-of-the-week/cluster-idempotency) | `part4-idempotency` | planned |
 
 The Effect source for each part is in [Effect-TS/office-hours](https://github.com/Effect-TS/office-hours/tree/main/packages/module-of-the-week/src).
