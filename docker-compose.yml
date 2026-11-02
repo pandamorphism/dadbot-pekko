@@ -1,0 +1,22 @@
+# Postgres for parts 3 and 4: the event journal and snapshots of pekko-persistence-r2dbc.
+#   docker compose up -d     start it (creates the tables on first start)
+#   docker compose down -v   stop it and delete the data
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: dadbot
+      POSTGRES_USER: dadbot
+      POSTGRES_PASSWORD: dadbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - dadbot-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "dadbot", "-d", "dadbot"]
+      interval: 2s
+      retries: 15
+
+volumes:
+  dadbot-postgres:

@@ -10,7 +10,7 @@ This repository builds the same app on [Apache Pekko](https://pekko.apache.org/)
 |------|-------------|--------------|--------|
 | 1. Actors | [Cluster, Part 1](https://effect.website/blog/module-of-the-week/cluster-actors) | `part1-actors` | code done, post published |
 | 2. Messaging | [Cluster, Part 2](https://effect.website/blog/module-of-the-week/cluster-messaging) | `part2-messaging` | code done, post published |
-| 3. Delivery | [Cluster, Part 3](https://effect.website/blog/module-of-the-week/cluster-delivery) | `part3-delivery` | planned |
+| 3. Delivery | [Cluster, Part 3](https://effect.website/blog/module-of-the-week/cluster-delivery) | `part3-delivery` | code done, post planned |
 | 4. Idempotency | [Cluster, Part 4](https://effect.website/blog/module-of-the-week/cluster-idempotency) | `part4-idempotency` | planned |
 
 The Effect source for each part is in [Effect-TS/office-hours](https://github.com/Effect-TS/office-hours/tree/main/packages/module-of-the-week/src).
@@ -23,6 +23,7 @@ You need JDK 17+ and [sbt](https://www.scala-sbt.org/). Each part has a `Program
 sbt test                  # all parts
 sbt part1-actors/run      # naive handler repeats a joke; sharded Dads don't
 sbt part2-messaging/run   # three nodes in one JVM: batching, placement, a node leaving
+sbt part3-delivery/run    # needs Postgres (below): a node crashes, and its Dad still answers
 ```
 
 ### Part 2 on three real nodes
@@ -30,9 +31,9 @@ sbt part2-messaging/run   # three nodes in one JVM: batching, placement, a node 
 Each node is its own JVM with a webhook (`808n`), Pekko Management (`855n`) and cluster remoting (`2552n`). sbt allows one instance per project, so `scripts/node.sh` runs the nodes as plain JVMs. Close any other sbt in this project first, because the script calls sbt to export the classpath. Start node 0 first, in three terminals:
 
 ```bash
-scripts/node.sh 0
-scripts/node.sh 1
-scripts/node.sh 2
+scripts/node.sh 2 0
+scripts/node.sh 2 1
+scripts/node.sh 2 2
 ```
 
 Pekko's own logs are at WARN, so each node prints one line when it's ready: `node-1 is Up: webhook on :8081, management on :8551`. Before that, node 0 logs a couple of `Connection refused` warnings for `127.0.0.1:25521`. That's expected: node 1 is also a seed node, so node 0 first checks whether node 1 already runs a cluster. When nobody answers within `seed-node-timeout` (5 s), node 0 forms the cluster itself. Keeping two seeds lets a restarted node 0 rejoin the running cluster instead of forming a second one.
@@ -47,6 +48,20 @@ curl localhost:8550/cluster/shards/Dad   # this node's shards: #engineering is s
 ```
 
 Ctrl+C on a node makes it leave gracefully, and its shards are handed off. To crash a node, kill its JVM (`taskkill /F /PID <pid>` on Windows, `kill -9` elsewhere). The others mark it unreachable after a few seconds, and the split brain resolver downs it 20 s later. Messages to its shards are lost until then. Crash a node while all three are Up. With only two left, the split brain resolver has no majority (`keep-majority`): the side with the lowest address survives, so killing that node makes the other one down itself.
+
+### Part 3: Postgres and a crash
+
+Part 3's Dad is event sourced. He saves every message to a journal in Postgres before the webhook answers 202, and saves each joke after posting it. Remember-entities restarts him on another node when his node crashes, and the journal gives him back his unread messages and the jokes he has told. Start Postgres first (Docker), which creates the tables from `postgres/schema.sql` the first time:
+
+```bash
+docker compose up -d
+sbt part3-delivery/run    # three nodes in one JVM; the node hosting #engineering crashes with a message unread
+sbt part3-delivery/test   # Dad and webhook tests need no Docker; ClusterSpec is canceled without Postgres
+```
+
+`part3-delivery/run` and `ClusterSpec` clear the journal before they start, and `docker compose down -v` deletes it. Real nodes keep it: `scripts/node.sh 3 0`, `3 1`, `3 2` work like part 2's. Kill the JVM hosting `#engineering` right after a post, and about 45 s later a surviving node tells the joke without anyone posting again. That's a few seconds to mark the node unreachable, 20 s for the split brain resolver to down it, and another `down-removal-margin` (which the split brain resolver also sets to `stable-after`, 20 s) before its shards move. Until then the webhook answers 503 for those chats.
+
+`GET localhost:855n/ready` is 200 only when the node is an Up cluster member and Postgres answers (`DatabaseCheck`). `GET /alive` is 200 as long as the node runs. Stop Postgres (`docker compose stop`) to watch `/ready` fail and the webhook answer 503. A 503 doesn't always mean the message is lost: sharding buffers it, and it can still be saved once Postgres is back, so a chat that retries saves it twice. Part 4 deals with that.
 
 `common` holds what every part shares: `PunGenerator` (the same jokes as Effect's), `Chat` and the scripted conversation.
 
